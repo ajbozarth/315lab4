@@ -33,6 +33,7 @@ void execute() {
             case SP_JR:
                break;
             case SP_SRL:
+               rf.write(rt.rd, rf[rt.rt] >> rt.sa);
                break;
             case SP_SRA:
                break;
