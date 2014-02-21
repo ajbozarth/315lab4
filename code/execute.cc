@@ -28,14 +28,9 @@ void execute() {
                break;
          // Our modifications start here
             // Freebie from the ppt slides:
-            case SP_ADDU:
-               rf.write(rt.rd, rf[rt.rs] + rf[rt.rt]);
-               break;
             case SP_SLT:
                break;
             case SP_JR:
-               break;
-            case SP_SLL:
                break;
             case SP_SRL:
                break;
@@ -73,8 +68,6 @@ void execute() {
          break;
       case OP_SB:
          break;
-      case OP_LW:
-         break;
       case OP_LBU:
          break;
       case OP_LB:
@@ -94,8 +87,6 @@ void execute() {
       case OP_JAL:
          break;
       case OP_J:
-         break;
-      case OP_LUI:
          break;
    // Our modifications end here
       case OP_SW:
