@@ -88,7 +88,7 @@ void Stats::print() {
         << "Number of Memory Reads: " << numMemReads << endl
         << "Number of Memory Writes: " << numMemWrites << endl
         << "Number of Register Reads: " << numRegReads << endl
-        << "Number of Register Writes: " << numRegWrites << endl;
+        << "Number of Register Writes: " << numRegWrites << endl
         << "Branches: " << endl
         << "  Forward:" << endl
         << "    Taken: " << numForwardBranchesTaken << endl
