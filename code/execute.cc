@@ -11,6 +11,10 @@ unsigned int zeroExtend16to32ui(short i) {
    return static_cast<unsigned int>(i);
 }
 
+unsigned int signExtend8to32ui(unsigned int i) {
+   return static_cast<unsigned int>(static_cast<int>(static_cast<char>(i)));
+}
+
 void execute() {
    Data32 instr = imem[pc];
    GenericType rg(instr);
@@ -85,10 +89,19 @@ void execute() {
          rf.write(ri.rt, rf[ri.rs] | zeroExtend16to32ui(ri.imm));
          break;
       case OP_SB:
+         addr = rf[ri.rs] + signExtend16to32ui(ri.imm);
+         caches.access(addr);
+         dmem.write(addr, 0x000000FF & rf[ri.rt]);
          break;
       case OP_LBU:
+         addr = rf[ri.rs] + signExtend16to32ui(ri.imm);
+         caches.access(addr);
+         rf.write(ri.rt, 0x000000FF & dmem[addr]);
          break;
       case OP_LB:
+         addr = rf[ri.rs] + signExtend16to32ui(ri.imm);
+         caches.access(addr);
+         rf.write(ri.rt, signExtend8to32ui(0x000000FF & dmem[addr]));
          break;
       case OP_SLTI:
          rf.write(ri.rt, (rf[ri.rs] < signExtend16to32ui(ri.imm)) ? 1 : 0);
