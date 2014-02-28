@@ -91,12 +91,12 @@ void execute() {
       case OP_SB:
          addr = rf[ri.rs] + signExtend16to32ui(ri.imm);
          caches.access(addr);
-         dmem.write(addr, 0x000000FF & rf[ri.rt]);
+         dmem.write(addr, (0x000000FF & rf[ri.rt]) | (0xFFFFFF00 & dmem[addr]));
          break;
       case OP_LBU:
          addr = rf[ri.rs] + signExtend16to32ui(ri.imm);
          caches.access(addr);
-         rf.write(ri.rt, 0x000000FF & dmem[addr]);
+         rf.write(ri.rt, (0x000000FF & dmem[addr]));
          break;
       case OP_LB:
          addr = rf[ri.rs] + signExtend16to32ui(ri.imm);
