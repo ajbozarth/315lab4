@@ -138,7 +138,7 @@ void execute() {
       case OP_SB:
          addr = rf[ri.rs] + signExtend16to32ui(ri.imm);
          caches.access(addr);
-         dmem.write(addr, (0x000000FF & rf[ri.rt]) << 24);
+         dmem.write(addr, rf[ri.rt] << 24);
          stats.numIType++;
          stats.numMemWrites++;
          stats.numRegReads += 2; // from the OP_SB loading and address calc
@@ -175,21 +175,21 @@ void execute() {
          break;
       case OP_BNE:
          if (rf[ri.rs] != rf[ri.rt]) {
-            pc = pc + (ri.imm << 2);
+            pc.write(pc + (ri.imm << 2));
          }
          stats.numIType++;
          stats.numRegReads += 2;
          break;
       case OP_BEQ:
          if (rf[ri.rs] == rf[ri.rt]) {
-            pc = pc + (ri.imm << 2);
+            pc.write(pc + (ri.imm << 2));
          }
          stats.numIType++;
          stats.numRegReads += 2;
          break;
       case OP_BLEZ:
          if (rf[ri.rs] <= 0) {
-            pc = pc + (ri.imm << 2);
+            pc.write(pc + (ri.imm << 2));
          }
          stats.numRegReads++;
          stats.numIType++;
