@@ -15,6 +15,7 @@ unsigned int signExtend8to32ui(unsigned int i) {
    return static_cast<unsigned int>(static_cast<int>(static_cast<char>(i)));
 }
 
+
 void execute() {
    Data32 instr = imem[pc];
    GenericType rg(instr);
@@ -35,13 +36,15 @@ void execute() {
                stats.numRegWrites++;
                break;
             case SP_SLL:
+               if(instr.data_uint() == 0) {
+                  stats.instrs--;
+                  stats.numRType--;
+               }
                rf.write(rt.rd, rf[rt.rt] << rt.sa);
                stats.numRType++;
-               stats.numRegReads++; //double check, rt.sa shouldn't be a reg read
+               stats.numRegReads++;
                stats.numRegWrites++;
                break;
-         // Our modifications start here
-            // Freebie from the ppt slides:
             case SP_SLT:
                rf.write(rt.rd, (rf[rt.rs] < rf[rt.rt]) ? 1 : 0);
                stats.numRType++;
@@ -56,13 +59,13 @@ void execute() {
             case SP_SRL:
                rf.write(rt.rd, rf[rt.rt].data_int() >> rt.sa);
                stats.numRType++;
-               stats.numRegReads++; //double check, rt.sa shouldn't be a reg read
+               stats.numRegReads++;
                stats.numRegWrites++;
                break;
             case SP_SRA:
                rf.write(rt.rd, rf[rt.rt].data_uint() >> rt.sa);
                stats.numRType++;
-               stats.numRegReads++; //double check, rt.sa shouldn't be a reg read
+               stats.numRegReads++;
                stats.numRegWrites++;
                break;
             case SP_ADD:
@@ -111,8 +114,8 @@ void execute() {
                rf.write(rt.rd, pc + 4);
                pc.write(rf[rt.rs]);
                stats.numRType++;
-               stats.numRegReads++;
-               stats.numRegWrites++;
+               stats.numRegReads += 2;
+               stats.numRegWrites += 2;
                break;
          // Our modifications end here
             default:
@@ -149,7 +152,7 @@ void execute() {
          rf.write(ri.rt, dmem[addr] >> 24);
          stats.numIType++;
          stats.numMemReads++;
-         stats.numRegReads++; // from address calc
+         stats.numRegReads++;
          stats.numRegWrites++;
          break;
       case OP_LB:
@@ -158,7 +161,7 @@ void execute() {
          rf.write(ri.rt, signExtend8to32ui(dmem[addr] >> 24));
          stats.numIType++;
          stats.numMemReads++;
-         stats.numRegReads++; // from address calc
+         stats.numRegReads++;
          stats.numRegWrites++;
          break;
       case OP_SLTI:
@@ -191,8 +194,8 @@ void execute() {
          if (rf[ri.rs] <= 0) {
             pc.write(pc + (ri.imm << 2));
          }
-         stats.numRegReads++;
          stats.numIType++;
+         stats.numRegReads++;
          break;
       case OP_LUI:
          rf.write(ri.rt, (ri.imm << 16));
@@ -203,13 +206,11 @@ void execute() {
          rf.write(31, pc + 4);
          pc.write((pc & 0xf0000000) | (rj.target << 2));
          stats.numJType++; 
-         stats.numRegReads++;
          stats.numRegWrites++;
          break;
       case OP_J:
          pc.write((pc & 0xf0000000) | (rj.target << 2));
          stats.numJType++;
-         stats.numRegReads++;
          break;
    // Our modifications end here
       case OP_SW:
