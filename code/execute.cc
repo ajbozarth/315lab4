@@ -7,7 +7,7 @@ unsigned int signExtend16to32ui(short i) {
    return static_cast<unsigned int>(static_cast<int>(i));
 }
 
-unsigned int zeroExtend16to32ui(short i) {
+unsigned int zeroExtend16to32ui(unsigned short i) {
    return static_cast<unsigned int>(i);
 }
 
@@ -138,7 +138,7 @@ void execute() {
       case OP_SB:
          addr = rf[ri.rs] + signExtend16to32ui(ri.imm);
          caches.access(addr);
-         dmem.write(addr, (0x000000FF & rf[ri.rt]) | (0xFFFFFF00 & dmem[addr]));
+         dmem.write(addr, (0x000000FF & rf[ri.rt]) << 24);
          stats.numIType++;
          stats.numMemWrites++;
          stats.numRegReads += 2; // from the OP_SB loading and address calc
@@ -146,7 +146,7 @@ void execute() {
       case OP_LBU:
          addr = rf[ri.rs] + signExtend16to32ui(ri.imm);
          caches.access(addr);
-         rf.write(ri.rt, (0x000000FF & dmem[addr]));
+         rf.write(ri.rt, dmem[addr] >> 24);
          stats.numIType++;
          stats.numMemReads++;
          stats.numRegReads++; // from address calc
@@ -155,7 +155,7 @@ void execute() {
       case OP_LB:
          addr = rf[ri.rs] + signExtend16to32ui(ri.imm);
          caches.access(addr);
-         rf.write(ri.rt, signExtend8to32ui(0x000000FF & dmem[addr]));
+         rf.write(ri.rt, signExtend8to32ui(dmem[addr] >> 24));
          stats.numIType++;
          stats.numMemReads++;
          stats.numRegReads++; // from address calc
