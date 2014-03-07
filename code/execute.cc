@@ -18,6 +18,8 @@ unsigned int signExtend8to32ui(unsigned int i) {
 
 void execute() {
    Data32 instr = imem[pc];
+   Data32 memVal = imem[pc];
+   Data32 regVal = imem[pc];
    GenericType rg(instr);
    RType rt(instr);
    IType ri(instr);
@@ -57,13 +59,13 @@ void execute() {
                stats.numRegReads++;
                break;
             case SP_SRL:
-               rf.write(rt.rd, rf[rt.rt].data_int() >> rt.sa);
+               rf.write(rt.rd, rf[rt.rt].data_uint() >> rt.sa);
                stats.numRType++;
                stats.numRegReads++;
                stats.numRegWrites++;
                break;
             case SP_SRA:
-               rf.write(rt.rd, rf[rt.rt].data_uint() >> rt.sa);
+               rf.write(rt.rd, rf[rt.rt].data_int() >> rt.sa);
                stats.numRType++;
                stats.numRegReads++;
                stats.numRegWrites++;
@@ -141,24 +143,30 @@ void execute() {
       case OP_SB:
          addr = rf[ri.rs] + signExtend16to32ui(ri.imm);
          caches.access(addr);
-         dmem.write(addr, rf[ri.rt] << 24);
+         memVal = dmem[addr];
+         memVal.set_data_ubyte4(0, rf[ri.rt]);
+         dmem.write(addr, memVal);
          stats.numIType++;
          stats.numMemWrites++;
          stats.numRegReads += 2; // from the OP_SB loading and address calc
          break;
       case OP_LBU:
-         addr = rf[ri.rs] + signExtend16to32ui(ri.imm);
+         addr = rf[ri.rs] + signExtend16to32ui(ri.imm >> 2);
          caches.access(addr);
-         rf.write(ri.rt, dmem[addr] >> 24);
+         regVal = rf[ri.rt];
+         regVal.set_data_ubyte4(3, dmem[addr].data_ubyte4(ri.imm % 4));
+         rf.write(ri.rt, regVal);
          stats.numIType++;
          stats.numMemReads++;
          stats.numRegReads++;
          stats.numRegWrites++;
          break;
       case OP_LB:
-         addr = rf[ri.rs] + signExtend16to32ui(ri.imm);
+         addr = rf[ri.rs] + signExtend16to32ui(ri.imm >> 2);
          caches.access(addr);
-         rf.write(ri.rt, signExtend8to32ui(dmem[addr] >> 24));
+         regVal = rf[ri.rt];
+         regVal.set_data_ubyte4(3, dmem[addr].data_ubyte4(ri.imm % 4));
+         rf.write(ri.rt, regVal);
          stats.numIType++;
          stats.numMemReads++;
          stats.numRegReads++;
@@ -178,21 +186,21 @@ void execute() {
          break;
       case OP_BNE:
          if (rf[ri.rs] != rf[ri.rt]) {
-            pc.write(pc + (ri.imm << 2));
+            pc.write(pc + (signExtend16to32ui(ri.imm) << 2));
          }
          stats.numIType++;
          stats.numRegReads += 2;
          break;
       case OP_BEQ:
          if (rf[ri.rs] == rf[ri.rt]) {
-            pc.write(pc + (ri.imm << 2));
+            pc.write(pc + (signExtend16to32ui(ri.imm) << 2));
          }
          stats.numIType++;
          stats.numRegReads += 2;
          break;
       case OP_BLEZ:
          if (rf[ri.rs] <= 0) {
-            pc.write(pc + (ri.imm << 2));
+            pc.write(pc + (signExtend16to32ui(ri.imm) << 2));
          }
          stats.numIType++;
          stats.numRegReads++;
