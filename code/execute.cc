@@ -1,4 +1,5 @@
 #include "mipsim.hpp"
+#include <stdio.h>
 
 Stats stats;
 Caches caches(0);
@@ -15,6 +16,31 @@ unsigned int signExtend8to32ui(unsigned int i) {
    return static_cast<unsigned int>(static_cast<int>(static_cast<char>(i)));
 }
 
+// stall check function
+// basically if there is a LW or LB to a register and the next instruction needs to load from
+// that register, then a stall needs to happen.
+void checkForwardEx(Data32 i) {
+   // Checks 2 instructions later
+   Data32 nextInstr = imem[pc + 4];
+   GenericType rg(nextInstr);
+   RType rt(nextInstr);
+   IType ri(nextInstr);
+   Type iType = Data32::classifyType(nextInstr);
+   switch(iType) {
+      case R_TYPE:
+         if(rt.rt == i || rt.rs == i) {
+            stats.numExForwards++;
+         }
+         break;
+      case I_TYPE:
+         if(ri.rt == i || rt.rs == i) {
+            stats.numExForwards++;
+         }
+         break;
+      default:
+         break;
+   }
+}
 
 void execute() {
    Data32 instr = imem[pc];
@@ -36,6 +62,7 @@ void execute() {
                stats.numRType++;
                stats.numRegReads += 2;
                stats.numRegWrites++;
+               checkForwardEx(rt.rd);
                break;
             case SP_SLL:
                // noop check.
@@ -47,6 +74,7 @@ void execute() {
                stats.numRType++;
                stats.numRegReads++;
                stats.numRegWrites++;
+               checkForwardEx(rt.rd);
                break;
             case SP_SLT:
                // checking casting as int in case it's a sign issue
@@ -54,6 +82,7 @@ void execute() {
                stats.numRType++;
                stats.numRegReads += 2;
                stats.numRegWrites++;
+               checkForwardEx(rt.rd);
                break;
             case SP_JR:
                // For jump delay slot checks.
@@ -70,54 +99,63 @@ void execute() {
                stats.numRType++;
                stats.numRegReads++;
                stats.numRegWrites++;
+               checkForwardEx(rt.rd);
                break;
             case SP_SRA:
                rf.write(rt.rd, rf[rt.rt].data_int() >> rt.sa);
                stats.numRType++;
                stats.numRegReads++;
                stats.numRegWrites++;
+               checkForwardEx(rt.rd);
                break;
             case SP_ADD:
                rf.write(rt.rd, rf[rt.rs] + rf[rt.rt]);
                stats.numRType++;
                stats.numRegReads += 2;
                stats.numRegWrites++;
+               checkForwardEx(rt.rd);
                break;
             case SP_SUB:
                rf.write(rt.rd, rf[rt.rs] - rf[rt.rt]);
                stats.numRType++;
                stats.numRegReads += 2;
                stats.numRegWrites++;
+               checkForwardEx(rt.rd);
                break;
             case SP_SUBU:
                rf.write(rt.rd, rf[rt.rs] - rf[rt.rt]);
                stats.numRType++;
                stats.numRegReads += 2;
                stats.numRegWrites++;
+               checkForwardEx(rt.rd);
                break;
             case SP_AND:
                rf.write(rt.rd, rf[rt.rs] & rf[rt.rt]);
                stats.numRType++;
                stats.numRegReads += 2;
                stats.numRegWrites++;
+               checkForwardEx(rt.rd);
                break;
             case SP_OR:
                rf.write(rt.rd, rf[rt.rs] | rf[rt.rt]);
                stats.numRType++;
                stats.numRegReads += 2;
                stats.numRegWrites++;
+               checkForwardEx(rt.rd);
                break;
             case SP_XOR:
                rf.write(rt.rd, rf[rt.rs] ^ rf[rt.rt]);
                stats.numRType++;
                stats.numRegReads += 2;
                stats.numRegWrites++;
+               checkForwardEx(rt.rd);
                break;
             case SP_NOR:
                rf.write(rt.rd, !(rf[rt.rs] | rf[rt.rt]));
                stats.numRType++;
                stats.numRegReads += 2;
                stats.numRegWrites++;
+               checkForwardEx(rt.rd);
                break;
             case SP_JALR:
                //Jump delay slot
@@ -129,6 +167,7 @@ void execute() {
                stats.numRType++;
                stats.numRegReads += 2;
                stats.numRegWrites += 2;
+               checkForwardEx(rt.rd);
                break;
          // Our modifications end here
             default:
@@ -143,6 +182,7 @@ void execute() {
          stats.numIType++; 
          stats.numRegReads++;
          stats.numRegWrites++;
+         checkForwardEx(ri.rt);
          break;
    // Our modifications start here
       case OP_ORI:
@@ -150,6 +190,7 @@ void execute() {
          stats.numIType++;
          stats.numRegReads++;
          stats.numRegWrites++;
+         checkForwardEx(ri.rt);
          break;
       case OP_SB:
          addr = rf[ri.rs] + signExtend16to32ui(ri.imm);
@@ -160,6 +201,7 @@ void execute() {
          stats.numIType++;
          stats.numMemWrites++;
          stats.numRegReads += 2; // from the OP_SB loading and address calc
+         checkForwardEx(ri.rt);
          break;
       case OP_LBU:
          addr = rf[ri.rs] + signExtend16to32ui(ri.imm);
@@ -169,6 +211,11 @@ void execute() {
          stats.numMemReads++;
          stats.numRegReads++;
          stats.numRegWrites++;
+         if(imem[pc].data_uint() == 0) {
+            stats.loadHasLoadUseStall++;
+         }
+         stats.loadHasNoLoadUseHazard++;
+         checkForwardEx(ri.rt);
          break;
       case OP_LB:
          addr = rf[ri.rs] + signExtend16to32ui(ri.imm);
@@ -178,18 +225,25 @@ void execute() {
          stats.numMemReads++;
          stats.numRegReads++;
          stats.numRegWrites++;
+         if(imem[pc].data_uint() == 0) {
+            stats.loadHasLoadUseStall++;
+         }
+         stats.loadHasNoLoadUseHazard++;
+         checkForwardEx(ri.rt);
          break;
       case OP_SLTI:
          rf.write(ri.rt, (rf[ri.rs] < signExtend16to32ui(ri.imm)) ? 1 : 0);
          stats.numIType++;
          stats.numRegReads++;
          stats.numRegWrites++;
+         checkForwardEx(ri.rt);
          break;
       case OP_SLTIU:
          rf.write(ri.rt, (rf[ri.rs] < zeroExtend16to32ui(ri.imm)) ? 1 : 0);
          stats.numIType++;
          stats.numRegReads++;
          stats.numRegWrites++;
+         checkForwardEx(ri.rt);
          break;
       case OP_BNE:
          // Branch delay slot check
@@ -245,7 +299,6 @@ void execute() {
             (pc < (pc + (ri.imm << 2))) ? stats.numForwardBranchesNotTaken++
                                         : stats.numBackwardBranchesNotTaken++;
          }
-         
          stats.numIType++;
          stats.numRegReads++;
          break;
@@ -253,6 +306,7 @@ void execute() {
          rf.write(ri.rt, (ri.imm << 16));
          stats.numIType++;
          stats.numRegWrites++;
+         checkForwardEx(ri.rt);
          break;
       case OP_JAL:
          // Jump delay slot check
@@ -283,6 +337,7 @@ void execute() {
          stats.numIType++;
          stats.numMemWrites++;
          stats.numRegReads += 2; // from address calc and mem write
+         checkForwardEx(ri.rt);
          break;
       case OP_LW:
          addr = rf[ri.rs] + signExtend16to32ui(ri.imm);
@@ -292,6 +347,11 @@ void execute() {
          stats.numMemReads++;
          stats.numRegReads++;
          stats.numRegWrites++;
+         if(imem[pc].data_uint() == 0) {
+            stats.loadHasLoadUseStall++;
+         }
+         stats.loadHasNoLoadUseHazard++;
+         checkForwardEx(ri.rt);
          break;
       default:
          cout << "Unsupported instruction: ";
