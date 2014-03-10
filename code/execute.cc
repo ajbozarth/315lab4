@@ -18,8 +18,7 @@ unsigned int signExtend8to32ui(unsigned int i) {
 
 void execute() {
    Data32 instr = imem[pc];
-   Data32 memVal = imem[pc];
-   Data32 regVal = imem[pc];
+   Data32 memVal = imem[pc]; // init with junk val
    GenericType rg(instr);
    RType rt(instr);
    IType ri(instr);
@@ -144,29 +143,25 @@ void execute() {
          addr = rf[ri.rs] + signExtend16to32ui(ri.imm);
          caches.access(addr);
          memVal = dmem[addr];
-         memVal.set_data_ubyte4(0, rf[ri.rt]);
+         memVal.set_data_ubyte4(0, rf[ri.rt].data_ubyte4(3));
          dmem.write(addr, memVal);
          stats.numIType++;
          stats.numMemWrites++;
          stats.numRegReads += 2; // from the OP_SB loading and address calc
          break;
       case OP_LBU:
-         addr = rf[ri.rs] + signExtend16to32ui(ri.imm >> 2);
+         addr = rf[ri.rs] + signExtend16to32ui(ri.imm);
          caches.access(addr);
-         regVal = rf[ri.rt];
-         regVal.set_data_ubyte4(3, dmem[addr].data_ubyte4(ri.imm % 4));
-         rf.write(ri.rt, regVal);
+         rf.write(ri.rt, dmem[addr].data_ubyte4(0));
          stats.numIType++;
          stats.numMemReads++;
          stats.numRegReads++;
          stats.numRegWrites++;
          break;
       case OP_LB:
-         addr = rf[ri.rs] + signExtend16to32ui(ri.imm >> 2);
+         addr = rf[ri.rs] + signExtend16to32ui(ri.imm);
          caches.access(addr);
-         regVal = rf[ri.rt];
-         regVal.set_data_ubyte4(3, dmem[addr].data_ubyte4(ri.imm % 4));
-         rf.write(ri.rt, regVal);
+         rf.write(ri.rt, signExtend8to32ui(dmem[addr].data_ubyte4(0)));
          stats.numIType++;
          stats.numMemReads++;
          stats.numRegReads++;
