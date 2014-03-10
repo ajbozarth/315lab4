@@ -361,6 +361,7 @@ public:
 class Stats {
 public:
   unsigned int instrs;
+  unsigned int cycles; // my add for testing
 
   unsigned int numMemWrites;
   unsigned int numMemReads;
@@ -370,6 +371,9 @@ public:
   unsigned int numBranches;
   unsigned int numRegWrites;
   unsigned int numRegReads;
+
+  unsigned int numExForwards;
+  unsigned int numMemForwards;
 
   unsigned int numForwardBranchesTaken;
   unsigned int numForwardBranchesNotTaken;

@@ -82,6 +82,7 @@ bool Cache::access(unsigned int address) {
 void Stats::print() {
    cout << dec
         << "Total number of dynamic instructions: " << instrs << endl
+        << "Total number of cycles: " << cycles << endl // my add for testing
         << "  RType: " << numRType << endl
         << "  IType: " << numIType << endl
         << "  JType: " << numJType << endl
@@ -89,6 +90,9 @@ void Stats::print() {
         << "Number of Memory Writes: " << numMemWrites << endl
         << "Number of Register Reads: " << numRegReads << endl
         << "Number of Register Writes: " << numRegWrites << endl
+        << "Number of Forwards:" << endl
+        << "  From Ex Stage: " << numExForwards << endl
+        << "  From Mem Stage: " << numMemForwards << endl
         << "Branches: " << endl
         << "  Forward:" << endl
         << "    Taken: " << numForwardBranchesTaken << endl
@@ -99,6 +103,9 @@ void Stats::print() {
         << "Branch delay slot: " << endl
         << "  Useful instruction: " << hasUsefulBranchDelaySlot << endl
         << "  Not useful instruction: " << hasUselessBranchDelaySlot << endl
+        << "Jump delay slot: " << endl
+        << "  Useful instruction: " << hasUsefulJumpDelaySlot << endl
+        << "  Not useful instruction: " << hasUselessJumpDelaySlot << endl
         << "Load Use Hazard: " << endl
         << "  Has load use stall: " << loadHasLoadUseStall << endl
         << "  Has load use hazard: " << loadHasLoadUseHazard << endl
