@@ -50,14 +50,15 @@ void execute() {
                break;
             case SP_SLT:
                // checking casting as int in case it's a sign issue
-               rf.write(rt.rd, (static_cast<int>(rf[rt.rs]) < static_cast<int>(rf[rt.rt])) ? 1 : 0);
+               rf.write(rt.rd, rf[rt.rs] < rf[rt.rt] ? 1 : 0);
                stats.numRType++;
                stats.numRegReads += 2;
                stats.numRegWrites++;
                break;
             case SP_JR:
                // For jump delay slot checks.
-               imem[pc].data_uint() == 0 ? stats.hasUselessJumpDelaySlot++ : stats.hasUsefulJumpDelaySlot++;
+               imem[pc].data_uint() == 0 ? stats.hasUselessJumpDelaySlot++
+                                         : stats.hasUsefulJumpDelaySlot++;
 
                pc.write(rf[rt.rs]);
                stats.numRType++;
@@ -120,7 +121,8 @@ void execute() {
                break;
             case SP_JALR:
                //Jump delay slot
-               imem[pc].data_uint() == 0 ? stats.hasUselessJumpDelaySlot++ : stats.hasUsefulJumpDelaySlot++;
+               imem[pc].data_uint() == 0 ? stats.hasUselessJumpDelaySlot++
+                                         : stats.hasUsefulJumpDelaySlot++;
 
                rf.write(rt.rd, pc + 4);
                pc.write(rf[rt.rs]);
@@ -191,54 +193,57 @@ void execute() {
          break;
       case OP_BNE:
          // Branch delay slot check
-         imem[pc].data_uint() == 0 ? stats.hasUselessBranchDelaySlot++ : stats.hasUsefulBranchDelaySlot++;
+         imem[pc].data_uint() == 0 ? stats.hasUselessBranchDelaySlot++
+                                   : stats.hasUsefulBranchDelaySlot++;
 
          if (rf[ri.rs] != rf[ri.rt]) {
-            (pc < (pc + (ri.imm << 2))) 
-               ? stats.numForwardBranchesTaken++ :stats.numBackwardBranchesTaken++;
+            (pc < (pc + (ri.imm << 2))) ? stats.numForwardBranchesTaken++
+                                        : stats.numBackwardBranchesTaken++;
             pc.write(pc + (signExtend16to32ui(ri.imm) << 2));
             stats.numRegReads++;
             stats.numRegWrites++;
          }
          else {
-            (pc < (pc + (ri.imm << 2)))
-               ? stats.numForwardBranchesNotTaken++ : stats.numBackwardBranchesNotTaken++;
+            (pc < (pc + (ri.imm << 2))) ? stats.numForwardBranchesNotTaken++
+                                        : stats.numBackwardBranchesNotTaken++;
          }
          stats.numIType++;
          stats.numRegReads += 2;
          break;
       case OP_BEQ:
          // Branch delay slot check
-         imem[pc].data_uint() == 0 ? stats.hasUselessBranchDelaySlot++ : stats.hasUsefulBranchDelaySlot++;
+         imem[pc].data_uint() == 0 ? stats.hasUselessBranchDelaySlot++
+                                   : stats.hasUsefulBranchDelaySlot++;
          
          if (rf[ri.rs] == rf[ri.rt]) {
-            (pc < (pc + (ri.imm << 2))) 
-               ? stats.numForwardBranchesTaken++ : stats.numBackwardBranchesTaken++;
+            (pc < (pc + (ri.imm << 2))) ? stats.numForwardBranchesTaken++
+                                        : stats.numBackwardBranchesTaken++;
             pc.write(pc + (signExtend16to32ui(ri.imm) << 2));
             stats.numRegReads++;
             stats.numRegWrites++;
          }
          else {
-            (pc < (pc + (ri.imm << 2)))
-               ? stats.numForwardBranchesNotTaken++ : stats.numBackwardBranchesNotTaken++;
+            (pc < (pc + (ri.imm << 2))) ? stats.numForwardBranchesNotTaken++
+                                        : stats.numBackwardBranchesNotTaken++;
          }
          stats.numIType++;
          stats.numRegReads += 2;
          break;
       case OP_BLEZ:
          // Branch delay slot check
-         imem[pc].data_uint() == 0 ? stats.hasUselessBranchDelaySlot++ : stats.hasUsefulBranchDelaySlot++;
+         imem[pc].data_uint() == 0 ? stats.hasUselessBranchDelaySlot++
+                                   : stats.hasUsefulBranchDelaySlot++;
          
          if (rf[ri.rs] <= 0) {
-            (pc < (pc + (ri.imm << 2))) 
-               ? stats.numForwardBranchesTaken++ : stats.numBackwardBranchesTaken++;
+            (pc < (pc + (ri.imm << 2))) ? stats.numForwardBranchesTaken++
+                                        : stats.numBackwardBranchesTaken++;
             pc.write(pc + (signExtend16to32ui(ri.imm) << 2));
             stats.numRegReads++;
             stats.numRegWrites++;
          }
          else {
-            (pc < (pc + (ri.imm << 2))) 
-               ? stats.numForwardBranchesNotTaken++ : stats.numBackwardBranchesNotTaken++;
+            (pc < (pc + (ri.imm << 2))) ? stats.numForwardBranchesNotTaken++
+                                        : stats.numBackwardBranchesNotTaken++;
          }
          
          stats.numIType++;
@@ -251,7 +256,8 @@ void execute() {
          break;
       case OP_JAL:
          // Jump delay slot check
-         imem[pc].data_uint() == 0 ? stats.hasUselessJumpDelaySlot++ : stats.hasUsefulJumpDelaySlot++;
+         imem[pc].data_uint() == 0 ? stats.hasUselessJumpDelaySlot++
+                                   : stats.hasUsefulJumpDelaySlot++;
 
          rf.write(31, pc + 4);
          pc.write((pc & 0xf0000000) | (rj.target << 2));
@@ -261,7 +267,8 @@ void execute() {
          break;
       case OP_J:
          // Jump delay slot check
-         imem[pc].data_uint() == 0 ? stats.hasUselessJumpDelaySlot++ : stats.hasUsefulJumpDelaySlot++;
+         imem[pc].data_uint() == 0 ? stats.hasUselessJumpDelaySlot++
+                                   : stats.hasUsefulJumpDelaySlot++;
 
          pc.write((pc & 0xf0000000) | (rj.target << 2));
          stats.numJType++;
