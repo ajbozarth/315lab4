@@ -1,4 +1,7 @@
 #include "mipsim.hpp"
+#include <math.h>
+#include <stdio.h>
+#include <stdint.h>
 
 template<>
 void Memory<Data8, Data32>::write(const unsigned int addr, const Data32 data) {
@@ -76,7 +79,21 @@ void Memory<Data32, Data32>::dump(DataType dt) const {
 // cache size in blocks). You should also update the "hits" and
 // "misses" counters.
 bool Cache::access(unsigned int address) {
-   return false;
+   unsigned int bo_size = (unsigned int)log2((double)(blocksize));
+   unsigned int index_size = (unsigned int)log2((double)(size/blocksize));
+   unsigned int tag_size = 32 - bo_size - index_size;
+
+   unsigned int index = (index_size == 0) ? 0 : ((address << tag_size) >> (bo_size + tag_size));
+   unsigned int tag = address >> (bo_size + index_size);
+   
+   if (entries[index] == tag) {
+      hits++;
+      return true;
+   } else {
+      entries[index] = tag;
+      misses++;
+      return false;
+   }
 }
 
 void Stats::print() {
