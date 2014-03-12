@@ -4,6 +4,9 @@
 Stats stats;
 Caches caches(0);
 
+static unsigned int rd1;
+static unsigned int rd2;
+
 unsigned int signExtend16to32ui(short i) {
    return static_cast<unsigned int>(static_cast<int>(i));
 }
@@ -16,30 +19,23 @@ unsigned int signExtend8to32ui(unsigned int i) {
    return static_cast<unsigned int>(static_cast<int>(static_cast<char>(i)));
 }
 
-// stall check function
-// basically if there is a LW or LB to a register and the next instruction needs to load from
-// that register, then a stall needs to happen.
-void checkForwardEx(Data32 i) {
-   // Checks 2 instructions later
-   Data32 nextInstr = imem[pc + 4];
-   GenericType rg(nextInstr);
-   RType rt(nextInstr);
-   IType ri(nextInstr);
-   Type iType = Data32::classifyType(nextInstr);
-   switch(iType) {
-      case R_TYPE:
-         if(rt.rt == i || rt.rs == i) {
-            stats.numExForwards++;
-         }
-         break;
-      case I_TYPE:
-         if(ri.rt == i || rt.rs == i) {
-            stats.numExForwards++;
-         }
-         break;
-      default:
-         break;
+void setForwardEx(unsigned int rg) {
+   if (rg && rd1 && rg == rd1) {
+      stats.numExForwards++;
    }
+   if (rg && rd2 && rg == rd2) {
+      stats.numMemForwards++;
+   }
+}
+
+void setForwardEx(unsigned int rg1, unsigned int rg2) {
+   setForwardEx(rg1);
+   setForwardEx(rg2);
+}
+
+void setRd(unsigned int rd) {
+   rd2 = rd1;
+   rd1 = rd;
 }
 
 void execute() {
@@ -49,11 +45,29 @@ void execute() {
    RType rt(instr);
    IType ri(instr);
    JType rj(instr);
-   unsigned int pctarget = pc + 4;
    unsigned int addr;
+   unsigned int pctarget = pc + 4;
    stats.instrs++;
    stats.cycles++; // my added for testing
-   pc = pctarget;
+
+   static unsigned int next_pc;
+   static bool isJump;
+   static bool isBranch;
+
+   if (isJump) {
+      imem[pc].data_uint() == 0 ? stats.hasUselessJumpDelaySlot++
+                                : stats.hasUsefulJumpDelaySlot++;
+      pc = next_pc;
+      isJump = false;
+   } else if (isBranch) {
+      pc = next_pc;
+      isBranch = false;
+   } else {
+      pc = pctarget;
+   }
+
+   setForwardEx(instr);
+
    switch(rg.op) {
       case OP_SPECIAL:
          switch(rg.func) {
@@ -62,19 +76,22 @@ void execute() {
                stats.numRType++;
                stats.numRegReads += 2;
                stats.numRegWrites++;
-               checkForwardEx(rt.rd);
+               setForwardEx(rt.rs, rt.rt);
+               setRd(rt.rd);
                break;
             case SP_SLL:
                // noop check.
                if(instr.data_uint() == 0) {
                   stats.instrs--;
                   stats.numRType--;
+               } else {
+                  setForwardEx(rt.rt);
+                  setRd(rt.rd);
                }
                rf.write(rt.rd, rf[rt.rt] << rt.sa);
                stats.numRType++;
                stats.numRegReads++;
                stats.numRegWrites++;
-               checkForwardEx(rt.rd);
                break;
             case SP_SLT:
                // checking casting as int in case it's a sign issue
@@ -82,92 +99,98 @@ void execute() {
                stats.numRType++;
                stats.numRegReads += 2;
                stats.numRegWrites++;
-               checkForwardEx(rt.rd);
+               setForwardEx(rt.rs, rt.rt);
+               setRd(rt.rd);
                break;
             case SP_JR:
-               // For jump delay slot checks.
-               imem[pc].data_uint() == 0 ? stats.hasUselessJumpDelaySlot++
-                                         : stats.hasUsefulJumpDelaySlot++;
-
-               pc.write(rf[rt.rs]);
+               next_pc = rf[rt.rs].data_uint();
+               isJump = true;
                stats.numRType++;
                stats.numRegReads++;
-               stats.numRegWrites++;
+               setForwardEx(rt.rs);
+               setRd(0);
                break;
             case SP_SRL:
                rf.write(rt.rd, rf[rt.rt].data_uint() >> rt.sa);
                stats.numRType++;
                stats.numRegReads++;
                stats.numRegWrites++;
-               checkForwardEx(rt.rd);
+               setForwardEx(rt.rt);
+               setRd(rt.rd);
                break;
             case SP_SRA:
                rf.write(rt.rd, rf[rt.rt].data_int() >> rt.sa);
                stats.numRType++;
                stats.numRegReads++;
                stats.numRegWrites++;
-               checkForwardEx(rt.rd);
+               setForwardEx(rt.rt);
+               setRd(rt.rd);
                break;
             case SP_ADD:
                rf.write(rt.rd, rf[rt.rs] + rf[rt.rt]);
                stats.numRType++;
                stats.numRegReads += 2;
                stats.numRegWrites++;
-               checkForwardEx(rt.rd);
+               setForwardEx(rt.rs, rt.rt);
+               setRd(rt.rd);
                break;
             case SP_SUB:
                rf.write(rt.rd, rf[rt.rs] - rf[rt.rt]);
                stats.numRType++;
                stats.numRegReads += 2;
                stats.numRegWrites++;
-               checkForwardEx(rt.rd);
+               setForwardEx(rt.rs, rt.rt);
+               setRd(rt.rd);
                break;
             case SP_SUBU:
                rf.write(rt.rd, rf[rt.rs] - rf[rt.rt]);
                stats.numRType++;
                stats.numRegReads += 2;
                stats.numRegWrites++;
-               checkForwardEx(rt.rd);
+               setForwardEx(rt.rs, rt.rt);
+               setRd(rt.rd);
                break;
             case SP_AND:
                rf.write(rt.rd, rf[rt.rs] & rf[rt.rt]);
                stats.numRType++;
                stats.numRegReads += 2;
                stats.numRegWrites++;
-               checkForwardEx(rt.rd);
+               setForwardEx(rt.rs, rt.rt);
+               setRd(rt.rd);
                break;
             case SP_OR:
                rf.write(rt.rd, rf[rt.rs] | rf[rt.rt]);
                stats.numRType++;
                stats.numRegReads += 2;
                stats.numRegWrites++;
-               checkForwardEx(rt.rd);
+               setForwardEx(rt.rs, rt.rt);
+               setRd(rt.rd);
                break;
             case SP_XOR:
                rf.write(rt.rd, rf[rt.rs] ^ rf[rt.rt]);
                stats.numRType++;
                stats.numRegReads += 2;
                stats.numRegWrites++;
-               checkForwardEx(rt.rd);
+               setForwardEx(rt.rs, rt.rt);
+               setRd(rt.rd);
                break;
             case SP_NOR:
                rf.write(rt.rd, !(rf[rt.rs] | rf[rt.rt]));
                stats.numRType++;
                stats.numRegReads += 2;
                stats.numRegWrites++;
-               checkForwardEx(rt.rd);
+               setForwardEx(rt.rs, rt.rt);
+               setRd(rt.rd);
                break;
             case SP_JALR:
-               //Jump delay slot
-               imem[pc].data_uint() == 0 ? stats.hasUselessJumpDelaySlot++
-                                         : stats.hasUsefulJumpDelaySlot++;
-
                rf.write(rt.rd, pc + 4);
-               pc.write(rf[rt.rs]);
+               next_pc = rf[rt.rs].data_uint();
+               isJump = true;
                stats.numRType++;
-               stats.numRegReads += 2;
-               stats.numRegWrites += 2;
-               checkForwardEx(rt.rd);
+               stats.numRegReads++;
+               stats.numRegWrites++;
+               setForwardEx(rt.rs);
+               setRd(rt.rd);
                break;
          // Our modifications end here
             default:
@@ -182,7 +205,8 @@ void execute() {
          stats.numIType++; 
          stats.numRegReads++;
          stats.numRegWrites++;
-         checkForwardEx(ri.rt);
+         setForwardEx(rt.rs);
+         setRd(rt.rt);
          break;
    // Our modifications start here
       case OP_ORI:
@@ -190,7 +214,8 @@ void execute() {
          stats.numIType++;
          stats.numRegReads++;
          stats.numRegWrites++;
-         checkForwardEx(ri.rt);
+         setForwardEx(rt.rs);
+         setRd(rt.rt);
          break;
       case OP_SB:
          addr = rf[ri.rs] + signExtend16to32ui(ri.imm);
@@ -201,12 +226,13 @@ void execute() {
          stats.numIType++;
          stats.numMemWrites++;
          stats.numRegReads += 2; // from the OP_SB loading and address calc
-         checkForwardEx(ri.rt);
-         break;
+         setForwardEx(rt.rs, rt.rt);
+         setRd(0);
+        break;
       case OP_LBU:
          addr = rf[ri.rs] + signExtend16to32ui(ri.imm);
          caches.access(addr);
-         rf.write(ri.rt, dmem[addr].data_ubyte4(0));
+         rf.write(ri.rt, (unsigned int)(dmem[addr].data_ubyte4(0)));
          stats.numIType++;
          stats.numMemReads++;
          stats.numRegReads++;
@@ -215,7 +241,8 @@ void execute() {
             stats.loadHasLoadUseStall++;
          }
          stats.loadHasNoLoadUseHazard++;
-         checkForwardEx(ri.rt);
+         setForwardEx(rt.rs);
+         setRd(ri.rt);
          break;
       case OP_LB:
          addr = rf[ri.rs] + signExtend16to32ui(ri.imm);
@@ -229,105 +256,98 @@ void execute() {
             stats.loadHasLoadUseStall++;
          }
          stats.loadHasNoLoadUseHazard++;
-         checkForwardEx(ri.rt);
+         setForwardEx(rt.rs);
+         setRd(ri.rt);
          break;
       case OP_SLTI:
          rf.write(ri.rt, (rf[ri.rs] < signExtend16to32ui(ri.imm)) ? 1 : 0);
          stats.numIType++;
          stats.numRegReads++;
          stats.numRegWrites++;
-         checkForwardEx(ri.rt);
+         setForwardEx(rt.rs);
+         setRd(rt.rt);
          break;
       case OP_SLTIU:
          rf.write(ri.rt, (rf[ri.rs] < zeroExtend16to32ui(ri.imm)) ? 1 : 0);
          stats.numIType++;
          stats.numRegReads++;
          stats.numRegWrites++;
-         checkForwardEx(ri.rt);
+         setForwardEx(rt.rs);
+         setRd(rt.rt);
          break;
       case OP_BNE:
-         // Branch delay slot check
+         next_pc = pc + (signExtend16to32ui(ri.imm) << 2);
          imem[pc].data_uint() == 0 ? stats.hasUselessBranchDelaySlot++
                                    : stats.hasUsefulBranchDelaySlot++;
-
          if (rf[ri.rs] != rf[ri.rt]) {
-            (pc < (pc + (ri.imm << 2))) ? stats.numForwardBranchesTaken++
-                                        : stats.numBackwardBranchesTaken++;
-            pc.write(pc + (signExtend16to32ui(ri.imm) << 2));
-            stats.numRegReads++;
-            stats.numRegWrites++;
+            (pc < next_pc) ? stats.numForwardBranchesTaken++
+                           : stats.numBackwardBranchesTaken++;
+            isBranch = true;
          }
          else {
-            (pc < (pc + (ri.imm << 2))) ? stats.numForwardBranchesNotTaken++
-                                        : stats.numBackwardBranchesNotTaken++;
+            (pc < next_pc) ? stats.numForwardBranchesNotTaken++
+                           : stats.numBackwardBranchesNotTaken++;
          }
          stats.numIType++;
          stats.numRegReads += 2;
+         setForwardEx(rt.rs, rt.rt);
+         setRd(0);
          break;
       case OP_BEQ:
-         // Branch delay slot check
+         next_pc = pc + (signExtend16to32ui(ri.imm) << 2);
          imem[pc].data_uint() == 0 ? stats.hasUselessBranchDelaySlot++
                                    : stats.hasUsefulBranchDelaySlot++;
-         
          if (rf[ri.rs] == rf[ri.rt]) {
-            (pc < (pc + (ri.imm << 2))) ? stats.numForwardBranchesTaken++
-                                        : stats.numBackwardBranchesTaken++;
-            pc.write(pc + (signExtend16to32ui(ri.imm) << 2));
-            stats.numRegReads++;
-            stats.numRegWrites++;
+            (pc < next_pc) ? stats.numForwardBranchesTaken++
+                           : stats.numBackwardBranchesTaken++;
+            isBranch = true;
          }
          else {
-            (pc < (pc + (ri.imm << 2))) ? stats.numForwardBranchesNotTaken++
-                                        : stats.numBackwardBranchesNotTaken++;
+            (pc < next_pc) ? stats.numForwardBranchesNotTaken++
+                           : stats.numBackwardBranchesNotTaken++;
          }
          stats.numIType++;
          stats.numRegReads += 2;
+         setForwardEx(rt.rs, rt.rt);
+         setRd(0);
          break;
       case OP_BLEZ:
-         // Branch delay slot check
+         next_pc = pc + (signExtend16to32ui(ri.imm) << 2);
          imem[pc].data_uint() == 0 ? stats.hasUselessBranchDelaySlot++
                                    : stats.hasUsefulBranchDelaySlot++;
-         
          if (rf[ri.rs] <= 0) {
-            (pc < (pc + (ri.imm << 2))) ? stats.numForwardBranchesTaken++
-                                        : stats.numBackwardBranchesTaken++;
-            pc.write(pc + (signExtend16to32ui(ri.imm) << 2));
-            stats.numRegReads++;
-            stats.numRegWrites++;
+            (pc < next_pc) ? stats.numForwardBranchesTaken++
+                           : stats.numBackwardBranchesTaken++;
+            isBranch = true;
          }
          else {
-            (pc < (pc + (ri.imm << 2))) ? stats.numForwardBranchesNotTaken++
-                                        : stats.numBackwardBranchesNotTaken++;
+            (pc < next_pc) ? stats.numForwardBranchesNotTaken++
+                           : stats.numBackwardBranchesNotTaken++;
          }
          stats.numIType++;
-         stats.numRegReads++;
+         stats.numRegReads += 2;
+         setForwardEx(rt.rs);
+         setRd(0);
          break;
       case OP_LUI:
          rf.write(ri.rt, (ri.imm << 16));
          stats.numIType++;
          stats.numRegWrites++;
-         checkForwardEx(ri.rt);
+         setRd(ri.rt);
          break;
       case OP_JAL:
-         // Jump delay slot check
-         imem[pc].data_uint() == 0 ? stats.hasUselessJumpDelaySlot++
-                                   : stats.hasUsefulJumpDelaySlot++;
-
          rf.write(31, pc + 4);
-         pc.write((pc & 0xf0000000) | (rj.target << 2));
+         next_pc = (pc & 0xf0000000) | (rj.target << 2);
+         isJump = true;
          stats.numJType++; 
-         stats.numRegReads += 2;
-         stats.numRegWrites += 2;
+         stats.numRegWrites++;
+         setRd(31);
          break;
       case OP_J:
-         // Jump delay slot check
-         imem[pc].data_uint() == 0 ? stats.hasUselessJumpDelaySlot++
-                                   : stats.hasUsefulJumpDelaySlot++;
-
-         pc.write((pc & 0xf0000000) | (rj.target << 2));
+         next_pc = (pc & 0xf0000000) | (rj.target << 2);
+         isJump = true;
          stats.numJType++;
-         stats.numRegReads++;
-         stats.numRegWrites++;
+         setRd(0);
          break;
    // Our modifications end here
       case OP_SW:
@@ -337,7 +357,8 @@ void execute() {
          stats.numIType++;
          stats.numMemWrites++;
          stats.numRegReads += 2; // from address calc and mem write
-         checkForwardEx(ri.rt);
+         setForwardEx(rt.rs, ri.rt);
+         setRd(0);
          break;
       case OP_LW:
          addr = rf[ri.rs] + signExtend16to32ui(ri.imm);
@@ -351,7 +372,8 @@ void execute() {
             stats.loadHasLoadUseStall++;
          }
          stats.loadHasNoLoadUseHazard++;
-         checkForwardEx(ri.rt);
+         setForwardEx(rt.rs);
+         setRd(ri.rt);
          break;
       default:
          cout << "Unsupported instruction: ";
