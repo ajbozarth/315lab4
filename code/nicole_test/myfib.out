@@ -1,0 +1,210 @@
+Starting at PC 400168
+Executing: 400168: op: OP_ADDIU rs: 1d rt: 1d imm: ffe8
+Executing: 40016c: op: OP_SW rs: 1d rt: 1e imm: 10
+Executing: 400170: op: OP_SPECIAL rs: 1d rt: 0 rd: 1e sa: 0 func: SP_ADDU
+Executing: 400174: op: OP_SW rs: 1e rt: 0 imm: c
+Executing: 400178: op: OP_ADDIU rs: 0 rt: 2 imm: 1
+Executing: 40017c: op: OP_SW rs: 1e rt: 2 imm: 8
+Executing: 400180: op: OP_SW rs: 1e rt: 0 imm: 4
+Executing: 400184: op: OP_SW rs: 1e rt: 0 imm: 0
+Executing: 400188: op: OP_J target: 100073
+Executing: 4001cc: op: OP_LW rs: 1e rt: 2 imm: 0
+Executing: 4001d0: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001d4: op: OP_SLTI rs: 2 rt: 2 imm: a
+Executing: 4001d8: op: OP_BNE rs: 2 rt: 0 imm: ffed
+Executing: 400190: op: OP_LW rs: 1e rt: 3 imm: c
+Executing: 400194: op: OP_LW rs: 1e rt: 2 imm: 8
+Executing: 400198: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 40019c: op: OP_SPECIAL rs: 3 rt: 2 rd: 2 sa: 0 func: SP_ADDU
+Executing: 4001a0: op: OP_SW rs: 1e rt: 2 imm: 4
+Executing: 4001a4: op: OP_LW rs: 1e rt: 2 imm: 8
+Executing: 4001a8: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001ac: op: OP_SW rs: 1e rt: 2 imm: c
+Executing: 4001b0: op: OP_LW rs: 1e rt: 2 imm: 4
+Executing: 4001b4: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001b8: op: OP_SW rs: 1e rt: 2 imm: 8
+Executing: 4001bc: op: OP_LW rs: 1e rt: 2 imm: 0
+Executing: 4001c0: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001c4: op: OP_ADDIU rs: 2 rt: 2 imm: 1
+Executing: 4001c8: op: OP_SW rs: 1e rt: 2 imm: 0
+Executing: 4001cc: op: OP_LW rs: 1e rt: 2 imm: 0
+Executing: 4001d0: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001d4: op: OP_SLTI rs: 2 rt: 2 imm: a
+Executing: 4001d8: op: OP_BNE rs: 2 rt: 0 imm: ffed
+Executing: 400190: op: OP_LW rs: 1e rt: 3 imm: c
+Executing: 400194: op: OP_LW rs: 1e rt: 2 imm: 8
+Executing: 400198: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 40019c: op: OP_SPECIAL rs: 3 rt: 2 rd: 2 sa: 0 func: SP_ADDU
+Executing: 4001a0: op: OP_SW rs: 1e rt: 2 imm: 4
+Executing: 4001a4: op: OP_LW rs: 1e rt: 2 imm: 8
+Executing: 4001a8: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001ac: op: OP_SW rs: 1e rt: 2 imm: c
+Executing: 4001b0: op: OP_LW rs: 1e rt: 2 imm: 4
+Executing: 4001b4: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001b8: op: OP_SW rs: 1e rt: 2 imm: 8
+Executing: 4001bc: op: OP_LW rs: 1e rt: 2 imm: 0
+Executing: 4001c0: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001c4: op: OP_ADDIU rs: 2 rt: 2 imm: 1
+Executing: 4001c8: op: OP_SW rs: 1e rt: 2 imm: 0
+Executing: 4001cc: op: OP_LW rs: 1e rt: 2 imm: 0
+Executing: 4001d0: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001d4: op: OP_SLTI rs: 2 rt: 2 imm: a
+Executing: 4001d8: op: OP_BNE rs: 2 rt: 0 imm: ffed
+Executing: 400190: op: OP_LW rs: 1e rt: 3 imm: c
+Executing: 400194: op: OP_LW rs: 1e rt: 2 imm: 8
+Executing: 400198: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 40019c: op: OP_SPECIAL rs: 3 rt: 2 rd: 2 sa: 0 func: SP_ADDU
+Executing: 4001a0: op: OP_SW rs: 1e rt: 2 imm: 4
+Executing: 4001a4: op: OP_LW rs: 1e rt: 2 imm: 8
+Executing: 4001a8: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001ac: op: OP_SW rs: 1e rt: 2 imm: c
+Executing: 4001b0: op: OP_LW rs: 1e rt: 2 imm: 4
+Executing: 4001b4: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001b8: op: OP_SW rs: 1e rt: 2 imm: 8
+Executing: 4001bc: op: OP_LW rs: 1e rt: 2 imm: 0
+Executing: 4001c0: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001c4: op: OP_ADDIU rs: 2 rt: 2 imm: 1
+Executing: 4001c8: op: OP_SW rs: 1e rt: 2 imm: 0
+Executing: 4001cc: op: OP_LW rs: 1e rt: 2 imm: 0
+Executing: 4001d0: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001d4: op: OP_SLTI rs: 2 rt: 2 imm: a
+Executing: 4001d8: op: OP_BNE rs: 2 rt: 0 imm: ffed
+Executing: 400190: op: OP_LW rs: 1e rt: 3 imm: c
+Executing: 400194: op: OP_LW rs: 1e rt: 2 imm: 8
+Executing: 400198: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 40019c: op: OP_SPECIAL rs: 3 rt: 2 rd: 2 sa: 0 func: SP_ADDU
+Executing: 4001a0: op: OP_SW rs: 1e rt: 2 imm: 4
+Executing: 4001a4: op: OP_LW rs: 1e rt: 2 imm: 8
+Executing: 4001a8: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001ac: op: OP_SW rs: 1e rt: 2 imm: c
+Executing: 4001b0: op: OP_LW rs: 1e rt: 2 imm: 4
+Executing: 4001b4: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001b8: op: OP_SW rs: 1e rt: 2 imm: 8
+Executing: 4001bc: op: OP_LW rs: 1e rt: 2 imm: 0
+Executing: 4001c0: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001c4: op: OP_ADDIU rs: 2 rt: 2 imm: 1
+Executing: 4001c8: op: OP_SW rs: 1e rt: 2 imm: 0
+Executing: 4001cc: op: OP_LW rs: 1e rt: 2 imm: 0
+Executing: 4001d0: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001d4: op: OP_SLTI rs: 2 rt: 2 imm: a
+Executing: 4001d8: op: OP_BNE rs: 2 rt: 0 imm: ffed
+Executing: 400190: op: OP_LW rs: 1e rt: 3 imm: c
+Executing: 400194: op: OP_LW rs: 1e rt: 2 imm: 8
+Executing: 400198: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 40019c: op: OP_SPECIAL rs: 3 rt: 2 rd: 2 sa: 0 func: SP_ADDU
+Executing: 4001a0: op: OP_SW rs: 1e rt: 2 imm: 4
+Executing: 4001a4: op: OP_LW rs: 1e rt: 2 imm: 8
+Executing: 4001a8: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001ac: op: OP_SW rs: 1e rt: 2 imm: c
+Executing: 4001b0: op: OP_LW rs: 1e rt: 2 imm: 4
+Executing: 4001b4: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001b8: op: OP_SW rs: 1e rt: 2 imm: 8
+Executing: 4001bc: op: OP_LW rs: 1e rt: 2 imm: 0
+Executing: 4001c0: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001c4: op: OP_ADDIU rs: 2 rt: 2 imm: 1
+Executing: 4001c8: op: OP_SW rs: 1e rt: 2 imm: 0
+Executing: 4001cc: op: OP_LW rs: 1e rt: 2 imm: 0
+Executing: 4001d0: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001d4: op: OP_SLTI rs: 2 rt: 2 imm: a
+Executing: 4001d8: op: OP_BNE rs: 2 rt: 0 imm: ffed
+Executing: 400190: op: OP_LW rs: 1e rt: 3 imm: c
+Executing: 400194: op: OP_LW rs: 1e rt: 2 imm: 8
+Executing: 400198: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 40019c: op: OP_SPECIAL rs: 3 rt: 2 rd: 2 sa: 0 func: SP_ADDU
+Executing: 4001a0: op: OP_SW rs: 1e rt: 2 imm: 4
+Executing: 4001a4: op: OP_LW rs: 1e rt: 2 imm: 8
+Executing: 4001a8: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001ac: op: OP_SW rs: 1e rt: 2 imm: c
+Executing: 4001b0: op: OP_LW rs: 1e rt: 2 imm: 4
+Executing: 4001b4: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001b8: op: OP_SW rs: 1e rt: 2 imm: 8
+Executing: 4001bc: op: OP_LW rs: 1e rt: 2 imm: 0
+Executing: 4001c0: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001c4: op: OP_ADDIU rs: 2 rt: 2 imm: 1
+Executing: 4001c8: op: OP_SW rs: 1e rt: 2 imm: 0
+Executing: 4001cc: op: OP_LW rs: 1e rt: 2 imm: 0
+Executing: 4001d0: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001d4: op: OP_SLTI rs: 2 rt: 2 imm: a
+Executing: 4001d8: op: OP_BNE rs: 2 rt: 0 imm: ffed
+Executing: 400190: op: OP_LW rs: 1e rt: 3 imm: c
+Executing: 400194: op: OP_LW rs: 1e rt: 2 imm: 8
+Executing: 400198: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 40019c: op: OP_SPECIAL rs: 3 rt: 2 rd: 2 sa: 0 func: SP_ADDU
+Executing: 4001a0: op: OP_SW rs: 1e rt: 2 imm: 4
+Executing: 4001a4: op: OP_LW rs: 1e rt: 2 imm: 8
+Executing: 4001a8: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001ac: op: OP_SW rs: 1e rt: 2 imm: c
+Executing: 4001b0: op: OP_LW rs: 1e rt: 2 imm: 4
+Executing: 4001b4: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001b8: op: OP_SW rs: 1e rt: 2 imm: 8
+Executing: 4001bc: op: OP_LW rs: 1e rt: 2 imm: 0
+Executing: 4001c0: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001c4: op: OP_ADDIU rs: 2 rt: 2 imm: 1
+Executing: 4001c8: op: OP_SW rs: 1e rt: 2 imm: 0
+Executing: 4001cc: op: OP_LW rs: 1e rt: 2 imm: 0
+Executing: 4001d0: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001d4: op: OP_SLTI rs: 2 rt: 2 imm: a
+Executing: 4001d8: op: OP_BNE rs: 2 rt: 0 imm: ffed
+Executing: 400190: op: OP_LW rs: 1e rt: 3 imm: c
+Executing: 400194: op: OP_LW rs: 1e rt: 2 imm: 8
+Executing: 400198: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 40019c: op: OP_SPECIAL rs: 3 rt: 2 rd: 2 sa: 0 func: SP_ADDU
+Executing: 4001a0: op: OP_SW rs: 1e rt: 2 imm: 4
+Executing: 4001a4: op: OP_LW rs: 1e rt: 2 imm: 8
+Executing: 4001a8: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001ac: op: OP_SW rs: 1e rt: 2 imm: c
+Executing: 4001b0: op: OP_LW rs: 1e rt: 2 imm: 4
+Executing: 4001b4: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001b8: op: OP_SW rs: 1e rt: 2 imm: 8
+Executing: 4001bc: op: OP_LW rs: 1e rt: 2 imm: 0
+Executing: 4001c0: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001c4: op: OP_ADDIU rs: 2 rt: 2 imm: 1
+Executing: 4001c8: op: OP_SW rs: 1e rt: 2 imm: 0
+Executing: 4001cc: op: OP_LW rs: 1e rt: 2 imm: 0
+Executing: 4001d0: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001d4: op: OP_SLTI rs: 2 rt: 2 imm: a
+Executing: 4001d8: op: OP_BNE rs: 2 rt: 0 imm: ffed
+Executing: 400190: op: OP_LW rs: 1e rt: 3 imm: c
+Executing: 400194: op: OP_LW rs: 1e rt: 2 imm: 8
+Executing: 400198: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 40019c: op: OP_SPECIAL rs: 3 rt: 2 rd: 2 sa: 0 func: SP_ADDU
+Executing: 4001a0: op: OP_SW rs: 1e rt: 2 imm: 4
+Executing: 4001a4: op: OP_LW rs: 1e rt: 2 imm: 8
+Executing: 4001a8: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001ac: op: OP_SW rs: 1e rt: 2 imm: c
+Executing: 4001b0: op: OP_LW rs: 1e rt: 2 imm: 4
+Executing: 4001b4: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001b8: op: OP_SW rs: 1e rt: 2 imm: 8
+Executing: 4001bc: op: OP_LW rs: 1e rt: 2 imm: 0
+Executing: 4001c0: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001c4: op: OP_ADDIU rs: 2 rt: 2 imm: 1
+Executing: 4001c8: op: OP_SW rs: 1e rt: 2 imm: 0
+Executing: 4001cc: op: OP_LW rs: 1e rt: 2 imm: 0
+Executing: 4001d0: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001d4: op: OP_SLTI rs: 2 rt: 2 imm: a
+Executing: 4001d8: op: OP_BNE rs: 2 rt: 0 imm: ffed
+Executing: 400190: op: OP_LW rs: 1e rt: 3 imm: c
+Executing: 400194: op: OP_LW rs: 1e rt: 2 imm: 8
+Executing: 400198: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 40019c: op: OP_SPECIAL rs: 3 rt: 2 rd: 2 sa: 0 func: SP_ADDU
+Executing: 4001a0: op: OP_SW rs: 1e rt: 2 imm: 4
+Executing: 4001a4: op: OP_LW rs: 1e rt: 2 imm: 8
+Executing: 4001a8: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001ac: op: OP_SW rs: 1e rt: 2 imm: c
+Executing: 4001b0: op: OP_LW rs: 1e rt: 2 imm: 4
+Executing: 4001b4: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001b8: op: OP_SW rs: 1e rt: 2 imm: 8
+Executing: 4001bc: op: OP_LW rs: 1e rt: 2 imm: 0
+Executing: 4001c0: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001c4: op: OP_ADDIU rs: 2 rt: 2 imm: 1
+Executing: 4001c8: op: OP_SW rs: 1e rt: 2 imm: 0
+Executing: 4001cc: op: OP_LW rs: 1e rt: 2 imm: 0
+Executing: 4001d0: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001d4: op: OP_SLTI rs: 2 rt: 2 imm: a
+Executing: 4001d8: op: OP_BNE rs: 2 rt: 0 imm: ffed
+Executing: 4001dc: op: OP_SPECIAL rs: 0 rt: 0 rd: 0 sa: 0 func: SP_SLL
+Executing: 4001e0: op: OP_LW rs: 1e rt: 2 imm: 4
+Executing: 4001e4: op: OP_SPECIAL rs: 1e rt: 0 rd: 1d sa: 0 func: SP_ADDU
+Executing: 4001e8: op: OP_LW rs: 1d rt: 1e imm: 10
+Executing: 4001ec: op: OP_ADDIU rs: 1d rt: 1d imm: 18
+Executing: 4001f0: op: OP_SPECIAL rs: 1f rt: 0 rd: 0 sa: 0 func: SP_JR
