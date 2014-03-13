@@ -4,6 +4,7 @@
 Stats stats;
 Caches caches(0);
 
+static unsigned int rd;
 static unsigned int rd1;
 static unsigned int rd2;
 
@@ -20,10 +21,9 @@ unsigned int signExtend8to32ui(unsigned int i) {
 }
 
 void setForwardEx(unsigned int rg) {
-   if (rg && rd1 && rg == rd1) {
+   if (rd1 && rg == rd1) {
       stats.numExForwards++;
-   }
-   if (rg && rd2 && rg == rd2) {
+   } else if (rd2 && rg == rd2) {
       stats.numMemForwards++;
    }
 }
@@ -31,11 +31,6 @@ void setForwardEx(unsigned int rg) {
 void setForwardEx(unsigned int rg1, unsigned int rg2) {
    setForwardEx(rg1);
    setForwardEx(rg2);
-}
-
-void setRd(unsigned int rd) {
-   rd2 = rd1;
-   rd1 = rd;
 }
 
 void execute() {
@@ -66,7 +61,7 @@ void execute() {
       pc = pctarget;
    }
 
-   setForwardEx(instr);
+   rd = 0;
 
    switch(rg.op) {
       case OP_SPECIAL:
@@ -77,7 +72,7 @@ void execute() {
                stats.numRegReads += 2;
                stats.numRegWrites++;
                setForwardEx(rt.rs, rt.rt);
-               setRd(rt.rd);
+               rd = rt.rd;
                break;
             case SP_SLL:
                // noop check.
@@ -86,7 +81,7 @@ void execute() {
                   stats.numRType--;
                } else {
                   setForwardEx(rt.rt);
-                  setRd(rt.rd);
+                  rd = rt.rd;
                }
                rf.write(rt.rd, rf[rt.rt] << rt.sa);
                stats.numRType++;
@@ -100,7 +95,7 @@ void execute() {
                stats.numRegReads += 2;
                stats.numRegWrites++;
                setForwardEx(rt.rs, rt.rt);
-               setRd(rt.rd);
+               rd = rt.rd;
                break;
             case SP_JR:
                next_pc = rf[rt.rs].data_uint();
@@ -108,7 +103,6 @@ void execute() {
                stats.numRType++;
                stats.numRegReads++;
                setForwardEx(rt.rs);
-               setRd(0);
                break;
             case SP_SRL:
                rf.write(rt.rd, rf[rt.rt].data_uint() >> rt.sa);
@@ -116,7 +110,7 @@ void execute() {
                stats.numRegReads++;
                stats.numRegWrites++;
                setForwardEx(rt.rt);
-               setRd(rt.rd);
+               rd = rt.rd;
                break;
             case SP_SRA:
                rf.write(rt.rd, rf[rt.rt].data_int() >> rt.sa);
@@ -124,7 +118,7 @@ void execute() {
                stats.numRegReads++;
                stats.numRegWrites++;
                setForwardEx(rt.rt);
-               setRd(rt.rd);
+               rd = rt.rd;
                break;
             case SP_ADD:
                rf.write(rt.rd, rf[rt.rs] + rf[rt.rt]);
@@ -132,7 +126,7 @@ void execute() {
                stats.numRegReads += 2;
                stats.numRegWrites++;
                setForwardEx(rt.rs, rt.rt);
-               setRd(rt.rd);
+               rd = rt.rd;
                break;
             case SP_SUB:
                rf.write(rt.rd, rf[rt.rs] - rf[rt.rt]);
@@ -140,7 +134,7 @@ void execute() {
                stats.numRegReads += 2;
                stats.numRegWrites++;
                setForwardEx(rt.rs, rt.rt);
-               setRd(rt.rd);
+               rd = rt.rd;
                break;
             case SP_SUBU:
                rf.write(rt.rd, rf[rt.rs] - rf[rt.rt]);
@@ -148,7 +142,7 @@ void execute() {
                stats.numRegReads += 2;
                stats.numRegWrites++;
                setForwardEx(rt.rs, rt.rt);
-               setRd(rt.rd);
+               rd = rt.rd;
                break;
             case SP_AND:
                rf.write(rt.rd, rf[rt.rs] & rf[rt.rt]);
@@ -156,7 +150,7 @@ void execute() {
                stats.numRegReads += 2;
                stats.numRegWrites++;
                setForwardEx(rt.rs, rt.rt);
-               setRd(rt.rd);
+               rd = rt.rd;
                break;
             case SP_OR:
                rf.write(rt.rd, rf[rt.rs] | rf[rt.rt]);
@@ -164,7 +158,7 @@ void execute() {
                stats.numRegReads += 2;
                stats.numRegWrites++;
                setForwardEx(rt.rs, rt.rt);
-               setRd(rt.rd);
+               rd = rt.rd;
                break;
             case SP_XOR:
                rf.write(rt.rd, rf[rt.rs] ^ rf[rt.rt]);
@@ -172,7 +166,7 @@ void execute() {
                stats.numRegReads += 2;
                stats.numRegWrites++;
                setForwardEx(rt.rs, rt.rt);
-               setRd(rt.rd);
+               rd = rt.rd;
                break;
             case SP_NOR:
                rf.write(rt.rd, !(rf[rt.rs] | rf[rt.rt]));
@@ -180,7 +174,7 @@ void execute() {
                stats.numRegReads += 2;
                stats.numRegWrites++;
                setForwardEx(rt.rs, rt.rt);
-               setRd(rt.rd);
+               rd = rt.rd;
                break;
             case SP_JALR:
                rf.write(rt.rd, pc + 4);
@@ -190,7 +184,7 @@ void execute() {
                stats.numRegReads++;
                stats.numRegWrites++;
                setForwardEx(rt.rs);
-               setRd(rt.rd);
+               rd = rt.rd;
                break;
          // Our modifications end here
             default:
@@ -206,7 +200,7 @@ void execute() {
          stats.numRegReads++;
          stats.numRegWrites++;
          setForwardEx(rt.rs);
-         setRd(rt.rt);
+         rd = rt.rt;
          break;
    // Our modifications start here
       case OP_ORI:
@@ -215,7 +209,7 @@ void execute() {
          stats.numRegReads++;
          stats.numRegWrites++;
          setForwardEx(rt.rs);
-         setRd(rt.rt);
+         rd = rt.rt;
          break;
       case OP_SB:
          addr = rf[ri.rs] + signExtend16to32ui(ri.imm);
@@ -227,7 +221,6 @@ void execute() {
          stats.numMemWrites++;
          stats.numRegReads += 2; // from the OP_SB loading and address calc
          setForwardEx(rt.rs, rt.rt);
-         setRd(0);
         break;
       case OP_LBU:
          addr = rf[ri.rs] + signExtend16to32ui(ri.imm);
@@ -242,7 +235,7 @@ void execute() {
          }
          stats.loadHasNoLoadUseHazard++;
          setForwardEx(rt.rs);
-         setRd(ri.rt);
+         rd = ri.rt;
          break;
       case OP_LB:
          addr = rf[ri.rs] + signExtend16to32ui(ri.imm);
@@ -257,7 +250,7 @@ void execute() {
          }
          stats.loadHasNoLoadUseHazard++;
          setForwardEx(rt.rs);
-         setRd(ri.rt);
+         rd = ri.rt;
          break;
       case OP_SLTI:
          rf.write(ri.rt, (rf[ri.rs] < signExtend16to32ui(ri.imm)) ? 1 : 0);
@@ -265,7 +258,7 @@ void execute() {
          stats.numRegReads++;
          stats.numRegWrites++;
          setForwardEx(rt.rs);
-         setRd(rt.rt);
+         rd = rt.rt;
          break;
       case OP_SLTIU:
          rf.write(ri.rt, (rf[ri.rs] < zeroExtend16to32ui(ri.imm)) ? 1 : 0);
@@ -273,7 +266,7 @@ void execute() {
          stats.numRegReads++;
          stats.numRegWrites++;
          setForwardEx(rt.rs);
-         setRd(rt.rt);
+         rd = rt.rt;
          break;
       case OP_BNE:
          next_pc = pc + (signExtend16to32ui(ri.imm) << 2);
@@ -291,7 +284,6 @@ void execute() {
          stats.numIType++;
          stats.numRegReads += 2;
          setForwardEx(rt.rs, rt.rt);
-         setRd(0);
          break;
       case OP_BEQ:
          next_pc = pc + (signExtend16to32ui(ri.imm) << 2);
@@ -309,7 +301,6 @@ void execute() {
          stats.numIType++;
          stats.numRegReads += 2;
          setForwardEx(rt.rs, rt.rt);
-         setRd(0);
          break;
       case OP_BLEZ:
          next_pc = pc + (signExtend16to32ui(ri.imm) << 2);
@@ -327,13 +318,12 @@ void execute() {
          stats.numIType++;
          stats.numRegReads += 2;
          setForwardEx(rt.rs);
-         setRd(0);
          break;
       case OP_LUI:
          rf.write(ri.rt, (ri.imm << 16));
          stats.numIType++;
          stats.numRegWrites++;
-         setRd(ri.rt);
+         rd = ri.rt;
          break;
       case OP_JAL:
          rf.write(31, pc + 4);
@@ -341,13 +331,12 @@ void execute() {
          isJump = true;
          stats.numJType++; 
          stats.numRegWrites++;
-         setRd(31);
+         rd = 31;
          break;
       case OP_J:
          next_pc = (pc & 0xf0000000) | (rj.target << 2);
          isJump = true;
          stats.numJType++;
-         setRd(0);
          break;
    // Our modifications end here
       case OP_SW:
@@ -358,7 +347,6 @@ void execute() {
          stats.numMemWrites++;
          stats.numRegReads += 2; // from address calc and mem write
          setForwardEx(rt.rs, ri.rt);
-         setRd(0);
          break;
       case OP_LW:
          addr = rf[ri.rs] + signExtend16to32ui(ri.imm);
@@ -373,7 +361,7 @@ void execute() {
          }
          stats.loadHasNoLoadUseHazard++;
          setForwardEx(rt.rs);
-         setRd(ri.rt);
+         rd = ri.rt;
          break;
       default:
          cout << "Unsupported instruction: ";
@@ -381,4 +369,7 @@ void execute() {
          exit(1);
          break;
    }
+
+   rd2 = rd1;
+   rd1 = rd;
 }

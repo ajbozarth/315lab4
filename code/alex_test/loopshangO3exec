@@ -1,0 +1,5 @@
+400510: LBU       rs: 5 rt: 2 imm: 0
+400518: SB        rs: 6 rt: 2 imm: 0
+40051c: LB        rs: 5 rt: 4 imm: 1
+400520: ADDIU     rs: 6 rt: 6 imm: 1
+400524: BNE       rs: 4 rt: 0 imm: fffa
